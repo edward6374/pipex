@@ -6,7 +6,7 @@
 #    By: vduchi <vduchi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/22 22:11:19 by vduchi            #+#    #+#              #
-#    Updated: 2022/11/30 17:16:46 by vduchi           ###   ########.fr        #
+#    Updated: 2022/12/03 19:46:56 by vduchi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ MID_GRAY		=	\033[38;5;245m
 DARK_GREEN		=	\033[38;2;75;179;82m
 DARK_YELLOW		=	\033[38;5;143m
 
-NAME_MAN		=	pipex
+NAME		=	pipex
 NAME_BON		=	pipex_bonus
 
 LIBS_DIR		=	libs
@@ -44,21 +44,22 @@ DEPS_DIR_BON	=	dep_bonus
 GNL_DIR			=	get_next_line
 INC_DIR			=	inc/ ft_printf/include/ get_next_line/
 
+LIBFT			=	libft
 PRINTF			=	ft_printf
-ALL_LIBS		=	ft_printf/libftprintf.a
+ALL_LIBS		=	libft/libft.a ft_printf/libftprintf.a
 
-SRCS			=	src_mand/main.c
-SRCS_BONUS		=	src_bonus/main_bonus.c
+SRCS			=	src_mand/main.c src_mand/check_command.c
+#SRCS_BONUS		=	src_bonus/main_bonus.c
 GNL_SRCS		=	get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
 OBJS			=	$(patsubst $(SRC_DIR_MAN)/%, $(OBJ_DIR_MAN)/%, $(SRCS:.c=.o))
-OBJS_BONUS		=	$(patsubst $(SRC_DIR_BON)/%, $(OBJ_DIR_BON)/%, $(SRCS_BONUS:.c=.o))
+#OBJS_BONUS		=	$(patsubst $(SRC_DIR_BON)/%, $(OBJ_DIR_BON)/%, $(SRCS_BONUS:.c=.o))
 GNL_OBJS		=	$(patsubst $(GNL_DIR)/%, $(GNL_DIR)/%, $(GNL_SRCS:.c=.o))
 DEPS			=	$(patsubst $(SRC_DIR_MAN)/%, $(DEPS_DIR_MAN)/%, $(SRCS:.c=.d))
-DEPS_BONUS		=	$(patsubst $(SRC_DIR_BON)/%, $(DEPS_DIR_BON)/%, $(SRCS_BONUS:.c=.d))
+#DEPS_BONUS		=	$(patsubst $(SRC_DIR_BON)/%, $(DEPS_DIR_BON)/%, $(SRCS_BONUS:.c=.d))
 GNL_DEPS		=	$(patsubst $(GNL_DIR)/%, $(GNL_DIR)/%, $(GNL_SRCS:.c=.d))
 
 CFLAGS			+= 	-Wall -Werror -Wextra -g -O3 $(addprefix -I , $(INC_DIR))
-LDFLAGS			= 	-L ft_printf -lftprintf
+LDFLAGS			= 	-L ft_printf -L libft -lft -lftprintf
 DEPFLAGS_MAN	=	-MMD -MP -MF $(DEPS_DIR_MAN)/$*.d
 DEPFLAGS_BON	=	-MMD -MP -MF $(DEPS_DIR_BON)/$*.d
 DEPFLAGS_GNL	=	-MMD -MP -MF $(GNL_DIR)/$*.d
@@ -80,32 +81,34 @@ $(GNL_DIR)/%.o		:	$(GNL_DIR)/%.c
 	@echo "$(YELLOW)$(patsubst $(GNL_DIR)/%,%, $<) \tcompiled!$(DEF_COLOR)"
 
 all				:
+	@$(MAKE) -C $(LIBFT)
 	@$(MAKE) -C $(PRINTF)
-	@$(MAKE) $(NAME_MAN)
+	@$(MAKE) $(NAME)
 
-bonus			:
-	@$(MAKE) -C $(PRINTF)
-	@$(MAKE) $(NAME_BON)
+#bonus			:
+#	@$(MAKE) -C $(LIBFT)
+#	@$(MAKE) -C $(PRINTF)
+#	@$(MAKE) $(NAME_BON)
 
-$(NAME_MAN)		::
-	@echo "$(MAGENTA)\nChecking push_swap...$(DEF_COLOR)"
+$(NAME)		::
+	@echo "$(MAGENTA)\nChecking pipex...$(DEF_COLOR)"
 
-$(NAME_MAN)		::	$(OBJ_DIR_MAN) $(DEPS_DIR_MAN) $(OBJS) $(ALL_LIBS)
-	@echo "$(ORANGE)Compiling push_swap exec...$(DEF_COLOR)"
+$(NAME)		::	$(OBJ_DIR_MAN) $(DEPS_DIR_MAN) $(OBJS) $(ALL_LIBS)
+	@echo "$(ORANGE)Compiling pipex exec...$(DEF_COLOR)"
 	@$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@
 
-$(NAME_MAN)		::
-	@echo "$(GREEN)Push_swap executable ready!$(DEF_COLOR)"
+$(NAME)		::
+	@echo "$(GREEN)Pipex executable ready!$(DEF_COLOR)"
 
-$(NAME_BON)		::
-	@echo "$(MAGENTA)\nChecking checker...$(DEF_COLOR)"
+#$(NAME_BON)		::
+#	@echo "$(MAGENTA)\nChecking pipex bonus...$(DEF_COLOR)"
 
-$(NAME_BON)		::	$(OBJ_DIR_BON) $(DEPS_DIR_BON) $(OBJS_BONUS) $(GNL_OBJS) $(ALL_LIBS)
-	@echo "$(ORANGE)Compiling checker exec...$(DEF_COLOR)"
-	@$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_BONUS) $(GNL_OBJS) -o $@
+#$(NAME_BON)		::	$(OBJ_DIR_BON) $(DEPS_DIR_BON) $(OBJS_BONUS) $(GNL_OBJS) $(ALL_LIBS)
+#	@echo "$(ORANGE)Compiling pipex bonus exec...$(DEF_COLOR)"
+#	@$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS_BONUS) $(GNL_OBJS) -o $@
 
-$(NAME_BON)		::
-	@echo "$(GREEN)Checker executable ready!$(DEF_COLOR)"
+#$(NAME_BON)		::
+#	@echo "$(GREEN)Pipex bonus executable ready!$(DEF_COLOR)"
 
 $(OBJ_DIR_MAN)	:
 	@$(MKDIR) $@
@@ -128,7 +131,8 @@ clean		:
 	@$(RM) $(GNL_DEPS)
 
 fclean		:	clean
-	@$(RM) $(NAME_MAN) $(NAME_BON) $(LIBS_DIR)
+	@$(RM) $(NAME) $(NAME_BON) $(LIBS_DIR)
+	@$(MAKE) -C libft fclean
 	@$(MAKE) -C ft_printf fclean
 	@echo "$(BLUE)\nPush_swap cleaned!$(DEF_COLOR)"
 
@@ -136,7 +140,7 @@ re			:	fclean all
 
 -include $(DEPS)
 -include $(GNL_DEPS)
--include $(DEPS_BONUS)
+#-include $(DEPS_BONUS)
 
 .PHONY: all clean fclean re
 
