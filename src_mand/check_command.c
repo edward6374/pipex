@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/01 19:07:09 by vduchi            #+#    #+#             */
-/*   Updated: 2022/12/04 21:11:00 by vduchi           ###   ########.fr       */
+/*   Updated: 2022/12/08 19:11:49 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,20 +45,25 @@ char	*just_the_command(char *argv)
 	i = -1;
 	while (++i < count)
 		cmd[i] = argv[i];
+	cmd[i] = '\0';
 	return (cmd);
 }
 
-char	*take_path(char **split, char *argv, int i)
+char	*take_path(char *split, char *argv)
 {
+	char	*cmd;
 	char	*exec;
 	char	*path;
 
+	cmd = just_the_command(argv);
+	if (!cmd)
+		return (NULL);
 	if (argv[0] != '/')
 	{
-		path = ft_strjoin(split[i], "/");
+		path = ft_strjoin(split, "/");
 		if (!path)
 			return (NULL);
-		exec = ft_strjoin(path, argv);
+		exec = ft_strjoin(path, cmd);
 		if (!exec)
 			return (NULL);
 		free(path);
@@ -66,10 +71,12 @@ char	*take_path(char **split, char *argv, int i)
 	}
 	else
 	{
-		exec = ft_strjoin(split[i], argv);
+		exec = ft_strjoin(split, cmd);
 		if (!exec)
 			return (NULL);
 	}
+	free(cmd);
+	cmd = NULL;
 	return (exec);
 }
 
@@ -82,7 +89,7 @@ int	execute_path(char **split, char *argv, t_token *token)
 	exec = NULL;
 	while (split[++i])
 	{
-		exec = take_path(split, argv, i);
+		exec = take_path(split[i], argv);
 		if (!exec)
 			return (-4);
 		if (access(exec, F_OK) == -1)
@@ -97,6 +104,8 @@ int	execute_path(char **split, char *argv, t_token *token)
 	if (!split[i])
 		return (free_pointers(split, exec, i, -3));
 	token->cmd = ft_strdup(exec); 
+	if (!token->cmd)
+		return (free_pointers(split, exec, i, -4));
 	return (free_pointers(split, exec, i, 0));
 }
 
@@ -116,11 +125,9 @@ int	check_command(char *argv, char *env[], t_token *token)
 //	}
 //	return (1);
 	int		i;
-	char	*path;
 	char	**split;
 
 	i = -1;
-	path = NULL;
 	split = NULL;
 	while (env[++i])
 	{
@@ -133,8 +140,5 @@ int	check_command(char *argv, char *env[], t_token *token)
 	if (!split)
 		return (-4);
 	i = -1;
-	path = just_the_command(argv);
-	if (!path)
-		return (-4);
-	return (execute_path(split, path, token));
+	return (execute_path(split, argv, token));
 }
