@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2022/12/08 18:44:31 by vduchi           ###   ########.fr       */
+/*   Updated: 2022/12/11 17:53:26 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ int	check_input(int *fd, char **argv, char **env, t_token *token)
 	if (fd[1] == -1)
 		return (print_error(-2, argv[4]));
 	token[1].file  = ft_strdup(argv[4]);
-	ft_printf("Token 0:\n\tFile: %s\n\tCmd: %s\nToken 1:\n\tFile: %s\n\tCmd: %s\n",
-			token[0].file, token[0].cmd, token[1].file, token[1].cmd);
+//	ft_printf("Token 0:\n\tFile: %s\n\tCmd: %s\nToken 1:\n\tFile: %s\n\tCmd: %s\n",
+//			token[0].file, token[0].cmd, token[1].file, token[1].cmd);
 	if (access(token[0].file, R_OK | W_OK) == -1)
 		return (print_error(-2, token[0].file));
 	if (access(token[1].file, R_OK | W_OK) == -1)
@@ -83,6 +83,6 @@ int	main(int argc, char *argv[], char *env[])
 		return (print_error(-1, NULL));
 	if (check_input(fd, argv, env, token) == 0)
 		return (0);
-//	if (run_command(fd, token) == 0)
-//		return (0);
+	if (run_commands(fd, token) == 0)
+		return (0);
 }

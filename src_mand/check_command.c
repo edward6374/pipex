@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/01 19:07:09 by vduchi            #+#    #+#             */
-/*   Updated: 2022/12/08 19:11:49 by vduchi           ###   ########.fr       */
+/*   Updated: 2022/12/11 17:45:48 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,5 @@ int	check_command(char *argv, char *env[], t_token *token)
 	}
 	if (!split)
 		return (-4);
-	i = -1;
 	return (execute_path(split, argv, token));
 }
