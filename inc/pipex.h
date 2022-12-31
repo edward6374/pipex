@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:18:34 by vduchi            #+#    #+#             */
-/*   Updated: 2022/12/11 19:44:57 by vduchi           ###   ########.fr       */
+/*   Updated: 2022/12/28 14:21:57 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 
 typedef struct s_token
 {
-	int		len;
+	int		fd;
 	char	*cmd;
 	char	*file;
 	char	**args;
@@ -35,6 +35,9 @@ typedef struct s_token
 int		check_command(char *argv, char *env[], t_token *token);
 
 /* ---		Run_command.c		--- */
-int		run_commands(int *fd, t_token *token);
+int		run_commands(t_token *token);
+
+int		free_double_ret_int(char **split, int i, int out);
+char	**free_double_ret_char(char **array, int i);
 
 #endif

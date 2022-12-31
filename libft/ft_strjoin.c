@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelon>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 01:21:50 by vduchi            #+#    #+#             */
-/*   Updated: 2022/05/19 17:11:40 by vduchi           ###   ########.fr       */
+/*   Updated: 2022/12/24 14:51:58 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,11 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	int		count;
 	char	*str;
 
-	i = 0;
-	j = 0;
+	if (!s1)
+		return (NULL);
+	i = ft_strlen(s1);
+	j = ft_strlen(s2);
 	count = -1;
-	while (s1[i] != '\0')
-		i++;
-	while (s2[j] != '\0')
-		j++;
 	str = (char *)malloc(sizeof(char) * (i + j + 1));
 	if (!str)
 		return (NULL);

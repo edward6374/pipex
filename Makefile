@@ -6,7 +6,7 @@
 #    By: vduchi <vduchi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/22 22:11:19 by vduchi            #+#    #+#              #
-#    Updated: 2022/12/11 17:19:29 by vduchi           ###   ########.fr        #
+#    Updated: 2022/12/27 19:44:35 by vduchi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,7 +48,8 @@ LIBFT			=	libft
 PRINTF			=	ft_printf
 ALL_LIBS		=	libft/libft.a ft_printf/libftprintf.a
 
-SRCS			=	src_mand/main.c src_mand/check_command.c src_mand/run_commands.c
+SRCS			=	src_mand/main.c src_mand/check_command.c src_mand/run_commands.c \
+					src_mand/free.c
 #SRCS_BONUS		=	src_bonus/main_bonus.c
 GNL_SRCS		=	get_next_line/get_next_line.c get_next_line/get_next_line_utils.c
 OBJS			=	$(patsubst $(SRC_DIR_MAN)/%, $(OBJ_DIR_MAN)/%, $(SRCS:.c=.o))

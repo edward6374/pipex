@@ -6,124 +6,89 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/01 19:07:09 by vduchi            #+#    #+#             */
-/*   Updated: 2022/12/11 17:45:48 by vduchi           ###   ########.fr       */
+/*   Updated: 2022/12/31 19:13:16 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 
-int	free_pointers(char **split, char *exec, int i, int out)
-{
-	if (split)
-	{
-		if (split[i])
-			while (split[i])
-				i++;
-		while (--i >= 0)
-			free(split[i]);
-		free(split);
-	}
-	if (exec)
-		free(exec);
-	return (out);
-}
-
-char	*just_the_command(char *argv)
+char	**update_args(char *exec, char **args)
 {
 	int		i;
-	int		count;
-	char	*cmd;
+	char	**res;
 
 	i = 0;
-	count = 0;
-	while (argv[i] != ' ' && argv[i] != '\0')
+	while(args[i])
 		i++;
-	count = i;
-	cmd = (char *)malloc(sizeof(char) * (i + 1));
-	if (!cmd)
+	res = (char **)malloc(sizeof(char *) * (i + 1));
+	if (!res)
 		return (NULL);
 	i = -1;
-	while (++i < count)
-		cmd[i] = argv[i];
-	cmd[i] = '\0';
-	return (cmd);
+	while (args[++i])
+	{
+		if (i == 0)
+			res[i] = ft_strdup(exec);
+		else
+			res[i] = ft_strdup(args[i]);
+		if (!res[i])
+			return (free_double_ret_char(res, i));
+	}
+	res[i] = NULL;
+	return (res);
 }
 
-char	*take_path(char *split, char *argv)
+int	take_path(char *split, char *input, char **args, t_token *token)
 {
-	char	*cmd;
 	char	*exec;
-	char	*path;
 
-	cmd = just_the_command(argv);
-	if (!cmd)
-		return (NULL);
-	if (argv[0] != '/')
-	{
-		path = ft_strjoin(split, "/");
-		if (!path)
-			return (NULL);
-		exec = ft_strjoin(path, cmd);
-		if (!exec)
-			return (NULL);
-		free(path);
-		path = NULL;
-	}
+	if (input[0] != '/')
+		exec = ft_strjoin(ft_strjoin(split, "/"), input);
 	else
+		exec = ft_strjoin(split, input);
+	if (!exec)
+		return (-1);
+	if (access(exec, F_OK) == -1)
 	{
-		exec = ft_strjoin(split, cmd);
-		if (!exec)
-			return (NULL);
+		free(exec);
+		exec = NULL;
+		return (0);
 	}
-	free(cmd);
-	cmd = NULL;
-	return (exec);
+	token->cmd = exec; 
+	token->args = update_args(exec, args);
+	if (!token->args)
+		return (free_double_ret_int(args, 0, 3));
+	free_double_ret_char(args, 0);
+	exec = NULL;
+	return (1);
 }
 
 int	execute_path(char **split, char *argv, t_token *token)
 {
 	int		i;
-	char	*exec;
+	int		res;
+	char	**args;
 
 	i = -1;
-	exec = NULL;
+	args = ft_split(argv, ' ');
+	if (!args)
+		return (free_double_ret_int(split, 0, 4));
 	while (split[++i])
 	{
-		exec = take_path(split[i], argv);
-		if (!exec)
-			return (-4);
-		if (access(exec, F_OK) == -1)
-		{
-			free(exec);
-			exec = NULL;
+		res = take_path(split[i], args[0], args, token);
+		if (res == -1)
+			return (free_double_ret_int(split, i, 4));
+		else if (res == 0)
 			continue ;
-		}
 		else
-			break ;
+			break;
 	}
 	if (!split[i])
-		return (free_pointers(split, exec, i, -3));
-	token->cmd = ft_strdup(exec); 
-	if (!token->cmd)
-		return (free_pointers(split, exec, i, -4));
-	return (free_pointers(split, exec, i, 0));
+		return (free_double_ret_int(split, i, 3));
+	return (free_double_ret_int(split, i, 0));
 }
 
 int	check_command(char *argv, char *env[], t_token *token)
 {
-//	if (fork() != 0)
-//	{
-//		char	*test[] = {argv[2], argv[1], NULL};
-//		if (execve(argv[2], test, NULL) == -1)
-//			strerror(errno);
-//	}
-//	else
-//	{
-//		char	*test[] = {argv[2], argv[3], NULL};
-//		if (execve(argv[2], test, NULL) == -1)
-//			strerror(errno);
-//	}
-//	return (1);
 	int		i;
 	char	**split;
 
@@ -138,6 +103,6 @@ int	check_command(char *argv, char *env[], t_token *token)
 		}
 	}
 	if (!split)
-		return (-4);
+		return (4);
 	return (execute_path(split, argv, token));
 }
