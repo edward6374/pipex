@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/27 19:42:05 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/09 20:12:37 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/27 16:01:31 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,17 +44,4 @@ char	**free_double_ret_char(char **array, int i)
 		free(array);
 		return (NULL);
 	}
-}
-
-char	*free_tokens(t_token *token)
-{
-	t_token	*tmp;
-
-	while (token)
-	{
-		tmp = token->next;
-		free(token);
-		token = tmp;
-	}
-	return (NULL);
 }

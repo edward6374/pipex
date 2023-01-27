@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/09 20:12:35 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/27 16:27:01 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,43 +28,30 @@ void	ft_error_out(int mode, char *arg)
 	}
 }
 
-void	initialize_token(int idx, t_token *next, t_token *start)
+void	init_tokens(t_token *token)
 {
-	next->idx = idx;
-	next->cmd = NULL;
-	next->args = NULL;
-	next->file = NULL;
-	next->next = NULL;
-	next->before = start;
-}
-
-t_token	*init_tokens(t_token *token)
-{
-	int		i;
-	t_token	*temp;
-
-	i = 0;
-	token = (t_token *)malloc(sizeof(t_token));
-	if (!token)
-		return (NULL);
-	initialize_token(0, token, NULL);
-	if (pipe(token->pipe) == -1)
+	token[0].idx = 0;
+	token[0].cmd = NULL;
+	token[0].args = NULL;
+	token[0].file = NULL;
+	token[0].before = NULL;
+	token[0].next = &token[1];
+	if (pipe(token[0].pipe) == -1)
 	{
 		perror("pipe");
-		free_tokens(token);
 		exit(EXIT_FAILURE);
 	}
-	temp = token;
-	while (i < 1)
+	token[1].idx = 1;
+	token[1].cmd = NULL;
+	token[1].args = NULL;
+	token[1].file = NULL;
+	token[1].before = &token[0];
+	token[1].next = NULL;
+	if (pipe(token[1].pipe) == -1)
 	{
-		temp->next = (t_token *)malloc(sizeof(t_token));
-		if (!temp->next)
-			return free_tokens(token);
-		initialize_token(temp->idx + 1, temp->next, temp);
-		temp = temp->next;
-		i++;
+		perror("pipe");
+		exit(EXIT_FAILURE);
 	}
-	return (token);
 }
 
 int	print_error(int i, char *arg)
@@ -106,7 +93,7 @@ int	execute_token(char *input, char *command, char *env[], t_token *token)
 	if (res != 0)
 		return (res);
 	res = run_command(token);
-	return (0);
+	return (res);
 }
 
 int	check_input(char **argv, char *env[], t_token *token)
@@ -141,14 +128,14 @@ int	check_input(char **argv, char *env[], t_token *token)
 int	main(int argc, char *argv[], char *env[])
 {
 	int		res;
-	t_token	*token;
+	t_token	token[2];
 
 	if (argc != 5)
 		return (print_error(1, NULL));
-	token = NULL;
-	token = init_tokens(token);
+	init_tokens(token);
 	res = execute_token(argv[1], argv[2], env, &token[0]);
-	res = check_input(argv, env, token);
+	res = execute_token(argv[4], argv[3], env, &token[1]);
+//	res = check_input(argv, env, token);
 	if (res != 0)
 		return (res);
 //	res = run_commands(token);

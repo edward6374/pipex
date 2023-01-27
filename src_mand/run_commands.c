@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/08 16:05:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/09 20:12:38 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/27 16:30:58 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	run_command(t_token *token)
 		return (-1);
 	else if (pid != 0)
 	{
-		if (token->idx == 0)
+		if (!token->idx)
 		{
 			close(token->pipe[0]);
 			dup2(token->pipe[1], 1);
@@ -31,28 +31,22 @@ int	run_command(t_token *token)
 			dup2(token->fd, 0);
 			close(token->fd);
 		}
-		else if (token->next == NULL)
+		else
 		{
 			close(token->pipe[1]);
-			dup2(token->pipe[0], 0);
-			close(token->pipe[1]);
+			dup2(token->pipe[0], token->before->pipe[1]);
+			close(token->pipe[0]);
 			dup2(token->fd, 1);
 			close(token->fd);
 		}
-		else
-		{
-			dup2(token->pipe[1], 1);
-			close(token->pipe[1]);
-			dup2(token->fd, 0);
-			close(token->fd);
-		}
-		if (execve(token[0].cmd, token[0].args, NULL) == -1)
+		if (execve(token->cmd, token->args, NULL) == -1)
 		{
 			perror(token[0].cmd);
 			exit (127);
 		}
 	}
 	waitpid(-1, &i, 0);
+	printf("I: %d\n", i);
 	return (0);
 }
 
