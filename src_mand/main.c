@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/27 16:27:01 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/29 21:23:52 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,20 @@ int	execute_token(char *input, char *command, char *env[], t_token *token)
 {
 	int	res;
 
-	if (access(input, F_OK | R_OK) == -1)
-		return (print_error(2, input));
-	token->fd = open(input, O_RDWR);
+	if (token->idx == 0)
+	{
+		if (access(input, F_OK | R_OK) == -1)
+			return (print_error(2, input));
+		token->fd = open(input, O_RDWR);
+	}
+	else
+		token->fd = open(input, O_RDWR | O_CREAT, 0644);
 	token->file = input;
 	res = print_error(check_command(command, env, token), command);
 	if (res != 0)
 		return (res);
 	res = run_command(token);
+	ft_printf("Res here: %d\n", res);
 	return (res);
 }
 
@@ -136,6 +142,7 @@ int	main(int argc, char *argv[], char *env[])
 	res = execute_token(argv[1], argv[2], env, &token[0]);
 	res = execute_token(argv[4], argv[3], env, &token[1]);
 //	res = check_input(argv, env, token);
+	ft_printf("Res: %d\n", res);
 	if (res != 0)
 		return (res);
 //	res = run_commands(token);

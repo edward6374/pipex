@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/01 19:07:09 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/09 20:12:35 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/29 20:37:54 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,17 +41,23 @@ int	take_path(char *split, char *input, char **args, t_token *token)
 {
 	char	*exec;
 
-	if (input[0] != '/')
-		exec = ft_strjoin(ft_strjoin(split, "/"), input);
+	exec = NULL;
+	if (!ft_strncmp(input, "exit", 4))
+		exec = ft_strdup("exit");
 	else
-		exec = ft_strjoin(split, input);
-	if (!exec)
-		return (-1);
-	if (access(exec, F_OK) == -1)
 	{
-		free(exec);
-		exec = NULL;
-		return (0);
+		if (input[0] != '/')
+			exec = ft_strjoin(ft_strjoin(split, "/"), input);
+		else
+			exec = ft_strjoin(split, input);
+		if (!exec)
+			return (-1);
+		if (access(exec, F_OK) == -1)
+		{
+			free(exec);
+			exec = NULL;
+			return (0);
+		}
 	}
 	token->cmd = exec; 
 	token->args = update_args(exec, args);
@@ -59,6 +65,7 @@ int	take_path(char *split, char *input, char **args, t_token *token)
 		return (free_double_ret_int(args, 0, 3));
 	free_double_ret_char(args, 0);
 	exec = NULL;
+//	ft_printf("Cmd: %s\nArg1: %s\nArg2: %s\n", token->cmd, token->args[0], token->args[1]);
 	return (1);
 }
 
