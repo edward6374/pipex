@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/08 16:05:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/29 21:37:31 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/30 17:50:23 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	run_command(t_token *token)
 {
 	int		j;
 	int		*i;
-	int		res;
+//	int		res;
 	int		pid;
 
 	j = 0;;
@@ -36,7 +36,7 @@ int	run_command(t_token *token)
 		}
 		else
 		{
-			ft_printf("Cmd: %s\nArg 1: %s\nArg 2: %s\n", token->cmd, token->args[0], token->args[1]);
+//			ft_printf("Cmd: %s\nArg 1: %s\nArg 2: %s\n", token->cmd, token->args[0], token->args[1]);
 			close(token->pipe[1]);
 			dup2(token->pipe[0], 0);
 			close(token->pipe[0]);
@@ -45,7 +45,7 @@ int	run_command(t_token *token)
 		}
 		if (!ft_strncmp(token->cmd, "exit", 4))
 		{
-			write(2, "Here\n", 5);
+//			write(2, "Here\n", 5);
 			exit(ft_atoi(token->args[1]));
 //			return (ft_atoi(token->args[1]));
 		}
@@ -55,8 +55,9 @@ int	run_command(t_token *token)
 			exit (127);
 		}
 	}
-	res = waitpid(-1, i, WEXITSTATUS);
-	printf("I: %d\nRes: %d\n", *i, res);
+//	res = waitpid(-1, i, 0);
+//	WEXITSTATUS(i);
+//	printf("I: %d\nRes: %d\n", *i, res);
 	return (0);
 }
 

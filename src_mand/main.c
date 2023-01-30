@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/29 21:23:52 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/01/30 17:35:24 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ int	execute_token(char *input, char *command, char *env[], t_token *token)
 	if (res != 0)
 		return (res);
 	res = run_command(token);
-	ft_printf("Res here: %d\n", res);
+//	ft_printf("Res here: %d\n", res);
 	return (res);
 }
 
@@ -142,7 +142,7 @@ int	main(int argc, char *argv[], char *env[])
 	res = execute_token(argv[1], argv[2], env, &token[0]);
 	res = execute_token(argv[4], argv[3], env, &token[1]);
 //	res = check_input(argv, env, token);
-	ft_printf("Res: %d\n", res);
+//	ft_printf("Res: %d\n", res);
 	if (res != 0)
 		return (res);
 //	res = run_commands(token);
