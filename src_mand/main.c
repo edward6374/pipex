@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/30 17:35:24 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/03/06 19:31:47 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,28 +30,16 @@ void	ft_error_out(int mode, char *arg)
 
 void	init_tokens(t_token *token)
 {
-	token[0].idx = 0;
 	token[0].cmd = NULL;
 	token[0].args = NULL;
 	token[0].file = NULL;
 	token[0].before = NULL;
 	token[0].next = &token[1];
-	if (pipe(token[0].pipe) == -1)
-	{
-		perror("pipe");
-		exit(EXIT_FAILURE);
-	}
-	token[1].idx = 1;
 	token[1].cmd = NULL;
 	token[1].args = NULL;
 	token[1].file = NULL;
 	token[1].before = &token[0];
 	token[1].next = NULL;
-	if (pipe(token[1].pipe) == -1)
-	{
-		perror("pipe");
-		exit(EXIT_FAILURE);
-	}
 }
 
 int	print_error(int i, char *arg)
@@ -81,27 +69,35 @@ int	print_error(int i, char *arg)
 	return (127);
 }
 
-int	execute_token(char *input, char *command, char *env[], t_token *token)
+int	execute_token(char **argv, char *env[], t_token *token)
 {
 	int	res;
 
-	if (token->idx == 0)
+	if (access(argv[1], F_OK | R_OK) == -1)
 	{
-		if (access(input, F_OK | R_OK) == -1)
-			return (print_error(2, input));
-		token->fd = open(input, O_RDWR);
+		print_error(2, argv[1]);
+		token[0].fd = -1;
+		token[0].file = NULL;
 	}
 	else
-		token->fd = open(input, O_RDWR | O_CREAT, 0644);
-	token->file = input;
-	res = print_error(check_command(command, env, token), command);
+	{
+		token[0].fd = open(argv[1], O_RDWR);
+		token[0].file = argv[1];
+	}
+	print_error(check_command(argv[2], env, &token[0]), argv[2]);
+	res = print_error(check_command(argv[3], env, &token[1]), argv[3]);
 	if (res != 0)
 		return (res);
+	token[1].fd = open(argv[4], O_RDWR | O_CREAT, 0644);
+	if (token[1].fd == -1)
+		return (print_error(2, argv[4]));
+	token[1].file = argv[4];
+//	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
 	res = run_command(token);
-//	ft_printf("Res here: %d\n", res);
 	return (res);
 }
 
+/*
 int	check_input(char **argv, char *env[], t_token *token)
 {
 	int	res;
@@ -112,9 +108,7 @@ int	check_input(char **argv, char *env[], t_token *token)
 		return (print_error(2, argv[1]));
 	token[0].fd = open(argv[1], O_RDWR);
 	token[0].file = argv[1];
-	res = print_error(check_command(argv[2], env, &token[0]), argv[2]);
-	if (res != 0)
-		return (res);
+	print_error(check_command(argv[2], env, &token[0]), argv[2]);
 	res = print_error(check_command(argv[3], env, &token[1]), argv[3]);
 	if (res != 0)
 		return (res);
@@ -130,17 +124,20 @@ int	check_input(char **argv, char *env[], t_token *token)
 //		return (print_error(2, token[1].file));
 	return (0);
 }
+*/
 
 int	main(int argc, char *argv[], char *env[])
 {
 	int		res;
-	t_token	token[2];
+	t_token	*token;
 
+	token = (t_token *)malloc(sizeof(t_token) * 2);
+	if  (!token)
+		return (print_error(4, NULL));
 	if (argc != 5)
 		return (print_error(1, NULL));
 	init_tokens(token);
-	res = execute_token(argv[1], argv[2], env, &token[0]);
-	res = execute_token(argv[4], argv[3], env, &token[1]);
+	res = execute_token(argv, env, token);
 //	res = check_input(argv, env, token);
 //	ft_printf("Res: %d\n", res);
 	if (res != 0)

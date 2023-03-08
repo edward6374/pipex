@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:18:34 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/27 16:25:55 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/03/06 19:30:57 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@
 typedef struct s_token
 {
 	int				fd;
-	int				idx;
-	int				pipe[2];
 	char			*cmd;
 	char			*file;
 	char			**args;

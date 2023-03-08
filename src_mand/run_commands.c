@@ -6,58 +6,99 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/08 16:05:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/01/30 17:50:23 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/03/06 20:18:06 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
-
+#include <errno.h>
 int	run_command(t_token *token)
 {
 	int		j;
 	int		*i;
 //	int		res;
 	int		pid;
+	int		p[2];
 
-	j = 0;;
+//	ft_printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
+	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
+	j = 0;
 	i = &j;
+	if (pipe(p) == -1)
+		return (-1);
 	pid = fork();
 	if (pid == -1)
 		return (-1);
+//	else if (pid == 0)
+//	{
+//		if (!token->idx)
+//		{
+//			close(token->pipe[0]);
+//			dup2(token->pipe[1], 1);
+//			close(token->pipe[1]);
+//			dup2(token->fd, 0);
+//			close(token->fd);
+//		}
+//		else
+//		{
+////			ft_printf("Cmd: %s\nArg 1: %s\nArg 2: %s\n", token->cmd, token->args[0], token->args[1]);
+//			close(token->pipe[1]);
+//			dup2(token->pipe[0], 0);
+//			close(token->pipe[0]);
+//			dup2(token->fd, 1);
+//			close(token->fd);
+//		}
+//		if (!ft_strncmp(token->cmd, "exit", 4))
+//		{
+////			write(2, "Here\n", 5);
+//			exit(ft_atoi(token->args[1]));
+////			return (ft_atoi(token->args[1]));
+//		}
+//		if (execve(token->cmd, token->args, NULL) == -1)
+//		{
+//			perror(token[0].cmd);
+//			exit (127);
+//		}
+//	}
 	else if (pid != 0)
 	{
-		if (!token->idx)
+		close(p[0]);
+		if (dup2(token[0].fd, 0) == -1)
 		{
-			close(token->pipe[0]);
-			dup2(token->pipe[1], 1);
-			close(token->pipe[1]);
-			dup2(token->fd, 0);
-			close(token->fd);
+			perror("Error with dup2");
+			exit(EXIT_FAILURE);
 		}
-		else
+		close(token[0].fd);
+		if (dup2(p[1], 1) == -1)
 		{
-//			ft_printf("Cmd: %s\nArg 1: %s\nArg 2: %s\n", token->cmd, token->args[0], token->args[1]);
-			close(token->pipe[1]);
-			dup2(token->pipe[0], 0);
-			close(token->pipe[0]);
-			dup2(token->fd, 1);
-			close(token->fd);
+			perror("Error with dup2");
+			exit(EXIT_FAILURE);
 		}
-		if (!ft_strncmp(token->cmd, "exit", 4))
+		close(p[1]);
+		if (execve(token[0].cmd, token[0].args, NULL) == -1)
 		{
-//			write(2, "Here\n", 5);
-			exit(ft_atoi(token->args[1]));
-//			return (ft_atoi(token->args[1]));
-		}
-		if (execve(token->cmd, token->args, NULL) == -1)
-		{
-			perror(token[0].cmd);
-			exit (127);
+			strerror(errno);
+			exit(127);
 		}
 	}
-//	res = waitpid(-1, i, 0);
-//	WEXITSTATUS(i);
-//	printf("I: %d\nRes: %d\n", *i, res);
+	close(p[1]);
+	if (dup2(p[0], 0) == -1)
+	{
+		perror("Error with dup2");
+		exit(EXIT_FAILURE);
+	}
+	close(p[0]);
+	if (dup2(token[1].fd, 1) == -1)
+	{
+		perror("Error with dup2");
+		exit(EXIT_FAILURE);
+	}
+	close(token[1].fd);
+	if (execve(token[1].cmd, token[1].args, NULL) == -1)
+	{
+		perror(token[1].cmd);
+		exit(127);
+	}
 	return (0);
 }
 
