@@ -6,13 +6,13 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/08 16:05:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/03/06 20:18:06 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/03/24 15:28:44 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 #include <errno.h>
-int	run_command(t_token *token)
+int	run_command(t_token *token, char *env[])
 {
 	int		j;
 	int		*i;
@@ -21,9 +21,10 @@ int	run_command(t_token *token)
 	int		p[2];
 
 //	ft_printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
-	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
+//	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
 	j = 0;
 	i = &j;
+//	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
 	if (pipe(p) == -1)
 		return (-1);
 	pid = fork();
@@ -60,7 +61,7 @@ int	run_command(t_token *token)
 //			exit (127);
 //		}
 //	}
-	else if (pid != 0)
+	else if (pid == 0)
 	{
 		close(p[0]);
 		if (dup2(token[0].fd, 0) == -1)
@@ -75,7 +76,7 @@ int	run_command(t_token *token)
 			exit(EXIT_FAILURE);
 		}
 		close(p[1]);
-		if (execve(token[0].cmd, token[0].args, NULL) == -1)
+		if (execve(token[0].cmd, token[0].args, env) == -1)
 		{
 			strerror(errno);
 			exit(127);
@@ -94,7 +95,14 @@ int	run_command(t_token *token)
 		exit(EXIT_FAILURE);
 	}
 	close(token[1].fd);
-	if (execve(token[1].cmd, token[1].args, NULL) == -1)
+//	token[1].args = malloc(sizeof(char *) * 3);
+//	token[1].args[0] = ft_strdup("/usr/bin/awk");
+//	token[1].args[1] = NULL;
+//	token[1].args[1] = ft_strdup("\"\'\"\"{print}\"\"\'\"");
+//	token[1].args[2] = ft_strdup(token[0].file);
+//	token[1].args[3] = NULL;
+//	printf("Cmd: %s\nArg 0: %s\nArg 1: %s\nArg  2: %s\n", token[1].cmd, token[1].args[0], token[1].args[1], token[1].args[2]);
+	if (execve(token[1].args[0], token[1].args, env) == -1)
 	{
 		perror(token[1].cmd);
 		exit(127);
