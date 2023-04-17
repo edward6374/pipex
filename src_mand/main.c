@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/03/24 15:29:00 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/04/17 16:48:32 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ int	execute_token(char **argv, char *env[], t_token *token)
 	}
 	print_error(check_command(argv[2], env, &token[0]), argv[2]);
 	res = print_error(check_command(argv[3], env, &token[1]), argv[3]);
+	return (1);
 	if (res != 0)
 		return (res);
 //	if (access(argv[4], F_OK) == 0 && access(argv[4], W_OK) != -1)
@@ -94,7 +95,7 @@ int	execute_token(char **argv, char *env[], t_token *token)
 		return (print_error(2, argv[4]));
 	token[1].file = argv[4];
 //	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
-	res = run_command(token, env);
+//	res = run_command(token, env);
 	return (res);
 }
 
@@ -140,6 +141,8 @@ int	main(int argc, char *argv[], char *env[])
 		return (print_error(1, NULL));
 	init_tokens(token);
 	res = execute_token(argv, env, token);
+	free(token);
+	exit(0);
 //	res = check_input(argv, env, token);
 //	ft_printf("Res: %d\n", res);
 	if (res != 0)

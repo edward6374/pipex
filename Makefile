@@ -6,7 +6,7 @@
 #    By: vduchi <vduchi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/22 22:11:19 by vduchi            #+#    #+#              #
-#    Updated: 2023/03/20 19:56:17 by vduchi           ###   ########.fr        #
+#    Updated: 2023/03/30 15:44:47 by vduchi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -135,7 +135,7 @@ fclean		:	clean
 	@$(RM) $(NAME) $(NAME_BON) $(LIBS_DIR)
 	@$(MAKE) -C libft fclean
 	@$(MAKE) -C ft_printf fclean
-	@echo "$(BLUE)\nPush_swap cleaned!$(DEF_COLOR)"
+	@echo "$(BLUE)\nPipex cleaned!$(DEF_COLOR)"
 
 re			:	fclean all
 
