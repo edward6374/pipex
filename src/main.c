@@ -6,26 +6,35 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:17:24 by vduchi            #+#    #+#             */
-/*   Updated: 2023/04/17 16:48:32 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/04/20 21:53:19 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 
-void	ft_error_out(int mode, char *arg)
+int	ft_error_out(int mode, char *arg)
 {
-	if (mode)
-		write(2, "pipex: ", 7);
-	if (arg)
+	int	i;
+
+	i = 0;
+	if (mode > 0 && mode != 3)
+		i = write(2, "pipex: ", 7);
+	if (arg != NULL && mode != 3)
 	{
-		write(2, arg, ft_strlen(arg));
-		write(2, ": ", 2);
+		i = write(2, arg, ft_strlen(arg));
+		i = write(2, ": ", 2);
 	}
 	if (mode == 2)
 	{
-		write(2, strerror(errno), ft_strlen(strerror(errno)));
-		write(2, "\n", 1);
+		i = write(2, strerror(errno), ft_strlen(strerror(errno)));
+		i = write(2, "\n", 1);
 	}
+	else if (mode == 3)
+	{
+		i = write(2, arg, ft_strlen(arg));
+		i = write(2, "\n", 1);
+	}
+	return (i);
 }
 
 void	init_tokens(t_token *token)
@@ -49,7 +58,7 @@ int	print_error(int i, char *arg)
 	if (i == 1)
 	{
 		if (ft_printf("Number of arguments not correct!\n") == -1)
-			write(2, "Printf error\n", 13);
+			i = write(2, "Printf error\n", 13);
 	}
 	else if (i == 2)
 	{
@@ -59,12 +68,12 @@ int	print_error(int i, char *arg)
 	else if (i == 3)
 	{
 		ft_error_out(1, arg);
-		ft_error_out(0, "command not found");
+		ft_error_out(3, "command not found");
 	}
 	else if (i == 4)
 	{
 		if (ft_printf("Malloc error!\n") == -1)
-			write(2, "Printf error\n", 13);
+			i = write(2, "Printf error\n", 13);
 	}
 	return (127);
 }
@@ -86,16 +95,16 @@ int	execute_token(char **argv, char *env[], t_token *token)
 	}
 	print_error(check_command(argv[2], env, &token[0]), argv[2]);
 	res = print_error(check_command(argv[3], env, &token[1]), argv[3]);
-	return (1);
+//	printf("Res: %d\n", res);
 	if (res != 0)
 		return (res);
 //	if (access(argv[4], F_OK) == 0 && access(argv[4], W_OK) != -1)
-	token[1].fd = open(argv[4], O_RDWR | O_CREAT, 0644);
+	token[1].fd = open(argv[4], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (token[1].fd == -1)
 		return (print_error(2, argv[4]));
 	token[1].file = argv[4];
 //	printf("0:\n\tArgs 0: %s\n\tArgs 1: %s\n1:\n\tArgs 0: %s\n\tArgs 1: %s\nFd 0: %d\nFd 1: %d\nFile 0: %s\nFile 1: %s\n", token[0].args[0], token[0].args[1], token[1].args[0], token[1].args[1], token[0].fd, token[1].fd, token[0].file, token[1].file);
-//	res = run_command(token, env);
+	res = run_command(token, env);
 	return (res);
 }
 
@@ -142,7 +151,6 @@ int	main(int argc, char *argv[], char *env[])
 	init_tokens(token);
 	res = execute_token(argv, env, token);
 	free(token);
-	exit(0);
 //	res = check_input(argv, env, token);
 //	ft_printf("Res: %d\n", res);
 	if (res != 0)

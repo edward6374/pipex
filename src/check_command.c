@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/01 19:07:09 by vduchi            #+#    #+#             */
-/*   Updated: 2023/04/17 21:41:04 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/04/20 21:41:27 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,13 +299,21 @@ int	free_elems(char **elems, char **split, int exit)
 	int	i;
 
 	i = -1;
-	while (elems[++i])
-		free(elems[i]);
-	free(elems);
-	i = -1;
-	while (split[++i])
-		free(split[i]);
-	free(split);
+	if (elems)
+	{
+		while (elems[++i])
+			free(elems[i]);
+		free(elems);
+		i = -1;
+	}
+	if (split)
+	{
+		while (split[++i])
+			free(split[i]);
+		free(split);
+	}
+	elems = NULL;
+	split = NULL;
 	return (exit);
 }
 
@@ -323,6 +331,7 @@ char	**free_res(char **res, int count)
 		count--;
 	}
 	free(res);
+	res = NULL;
 	return (NULL);
 }
 
@@ -355,9 +364,6 @@ int	find_exec(char **res, char *cmd)
 		return (free_temp(t1, t2, -1));
 	free(t1);
 	t1 = NULL;
-//	write(1, "T1:\t", 4);
-//	write(1, t2, ft_strlen(t2));
-//	write(1, "\n", 1);
 	if (access(t2, F_OK) == 0)
 	{
 		free(res[0]);
@@ -366,7 +372,6 @@ int	find_exec(char **res, char *cmd)
 			return (free_temp(t1, t2, -1));
 		return (free_temp(t1, t2, 1));
 	}
-//	write(1, "After\n", 6);
 	return (free_temp(t1, t2, 0));
 }
 
@@ -473,7 +478,7 @@ char	**divide_args(char *argv)
 	while (argv[++i])
 	{
 		check_quotes(argv[i], quotes, &c_s[1]);
-		if (quotes[0] == 0 & quotes[1] == 0)
+		if (quotes[0] == 0 && quotes[1] == 0)
 			if (!new_elem(res, argv, c_s, i))
 				return (free_res(res, c_s[0] - 1));
 	}
@@ -483,15 +488,12 @@ char	**divide_args(char *argv)
 
 int	take_strings(char **split, char *argv, t_token *token)
 {
-	int		i;
+//	int		i;
 	int		result;
 	char	**elems;
 
-	(void)token;
-	i = -1;
+//	i = -1;
 	elems = divide_args(argv);
-//	while(elems[++i])
-//		printf("Elem: %s\n", elems[i]);
 	result = check_path(elems, split);
 	if (result == 0)
 		return (free_elems(elems, split, 3));
@@ -499,11 +501,13 @@ int	take_strings(char **split, char *argv, t_token *token)
 		return (free_elems(elems, split, 4));
 	token->cmd = ft_strdup(elems[0]);
 	token->args = elems;
+//	while(elems[++i])
+//		printf("Elem: %s\n", elems[i]);
 //	int pid = fork();
 //	if (pid == 0)
 //		execve(elems[0], elems, NULL);
 //	printf("Command executed\n");
-	return (0);
+	return (free_elems(NULL, split, 0));
 }
 
 int	check_command(char *argv, char *env[], t_token *token)
