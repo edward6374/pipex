@@ -6,7 +6,7 @@
 #    By: vduchi <vduchi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/22 22:11:19 by vduchi            #+#    #+#              #
-#    Updated: 2023/04/20 20:32:56 by vduchi           ###   ########.fr        #
+#    Updated: 2023/05/17 11:41:24 by vduchi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,28 +31,21 @@ MID_GRAY		=	\033[38;5;245m
 DARK_GREEN		=	\033[38;2;75;179;82m
 DARK_YELLOW		=	\033[38;5;143m
 
-NAME		=	pipex
-NAME_BON		=	pipex_bonus
+NAME			=	pipex
 
-LIBS_DIR		=	libs
 SRC_DIR_MAN		=	src
 OBJ_DIR_MAN		=	obj
 DEPS_DIR_MAN	=	deps
-INC_DIR			=	inc/ ft_printf/include/
+INC_DIR			=	inc/
 
 LIBFT			=	libft
-PRINTF			=	ft_printf
-LIBFT_A			=	libft/libft.a
-PRINTF_A		=	ft_printf/libftprintf.a
-ALL_LIBS		=	libs/libft.a libs/libftprintf.a
 
-SRCS			=	src/main.c src/check_command.c src/run_commands.c \
-					src/free.c
+SRCS			=	src/main.c src/run_command.c
 OBJS			=	$(patsubst $(SRC_DIR_MAN)/%, $(OBJ_DIR_MAN)/%, $(SRCS:.c=.o))
 DEPS			=	$(patsubst $(SRC_DIR_MAN)/%, $(DEPS_DIR_MAN)/%, $(SRCS:.c=.d))
 
 CFLAGS			+= 	-Wall -Werror -Wextra -g -O3 $(addprefix -I , $(INC_DIR))
-LDFLAGS			= 	-L $(LIBS_DIR) -lft -lftprintf
+LDFLAGS			= 	-L $(LIBFT) -lft
 DEPFLAGS_MAN	=	-MMD -MP -MF $(DEPS_DIR_MAN)/$*.d
 
 CC				=	gcc
@@ -60,10 +53,11 @@ RM				=	rm -rf
 MKDIR			=	mkdir -p
 
 $(OBJ_DIR_MAN)/%.o	:	$(SRC_DIR_MAN)/%.c
-	@$(CC) -c $< $(CFLAGS) $(LDFLAGS) $(DEPFLAGS_MAN) -o $@
+	@$(CC) -c $< $(CFLAGS) $(DEPFLAGS_MAN) -o $@
 	@echo "$(YELLOW)$(patsubst $(SRC_DIR_MAN)/%,%, $<) \tcompiled!$(DEF_COLOR)"
 
-all				:	$(LIBS_DIR) $(ALL_LIBS)
+all				:
+	@$(MAKE) -C $(LIBFT)
 	@$(MAKE) $(NAME)
 
 $(NAME)		::
@@ -76,19 +70,6 @@ $(NAME)		::	$(OBJ_DIR_MAN) $(DEPS_DIR_MAN) $(OBJS)
 $(NAME)		::
 	@echo "$(GREEN)Pipex executable ready!$(DEF_COLOR)"
 
-$(ALL_LIBS)	: $(LIBFT_A) $(PRINTF_A)
-	@cp $(LIBFT)/libft.a $(LIBS_DIR)
-	@cp $(PRINTF)/libftprintf.a $(LIBS_DIR)
-
-$(LIBFT_A)	:
-	@$(MAKE) -C $(LIBFT)
-
-$(PRINTF_A)	:
-	@$(MAKE) -C $(PRINTF)
-
-$(LIBS_DIR)	:
-	@$(MKDIR) $@
-
 $(OBJ_DIR_MAN)	:
 	@$(MKDIR) $@
 
@@ -100,9 +81,8 @@ clean		:
 	@$(RM) $(DEPS_DIR_MAN)
 
 fclean		:	clean
-	@$(RM) $(NAME) $(LIBS_DIR)
+	@$(RM) $(NAME)
 	@$(MAKE) -C libft fclean
-	@$(MAKE) -C ft_printf fclean
 	@echo "$(BLUE)\nPipex cleaned!$(DEF_COLOR)"
 
 re			:	fclean all

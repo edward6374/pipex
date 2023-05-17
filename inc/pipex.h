@@ -6,7 +6,7 @@
 /*   By: vduchi <vduchi@student.42barcelona.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 17:18:34 by vduchi            #+#    #+#             */
-/*   Updated: 2023/03/24 15:19:00 by vduchi           ###   ########.fr       */
+/*   Updated: 2023/05/17 11:36:02 by vduchi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,31 +16,25 @@
 # include <fcntl.h>
 # include <errno.h>
 # include <unistd.h>
-# include <stdlib.h>
-# include <sys/wait.h>
-# include <sys/types.h>
 # include "../libft/libft.h"
-# include "../ft_printf/include/ft_printf.h"
 
-typedef struct s_token
-{
-	int				fd;
-	char			*cmd;
-	char			*file;
-	char			**args;
-	struct s_token	*next;
-	struct s_token	*before;
-}		t_token;
+# define BASH "bash: "
+# define PIPEX "pipex: "
+# define CNTOPEN ": Cannot open"
+# define CMDNOTFOUND ": command not found"
+# define CNTCLOSE ": Fd can not be closed"
+# define PERMDEN ": Permission denied"
+# define BADFD ": Bad file descriptor"
+# define ERRPIPE ": error creating pipe"
+# define ERRFORK ": error creating fork"
+# define NOTFILEDIR ": No such file or directory"
+# define INVARGS ": Invalid number of arguments"
+# define MALLOCERR ": error trying to allocate memory"
+# define EXECVERR ": error on execve"
 
-/* ---		Check_command.c		--- */
-//char	*just_the_command(char *argv);
-int		check_command(char *argv, char *env[], t_token *token);
-
-/* ---		Run_command.c		--- */
-int		run_command(t_token *token, char *env[]);
-
-t_token	*free_tokens(t_token *token);
-char	**free_double_ret_char(char **array, int i);
-int		free_double_ret_int(char **split, int i, int out);
+char	*check_access(char *cmd);
+void	exit_error(int status, char *str1, char *str2, char *str3);
+void	execute_child(char *file, char *cmd, char *env[], int p[2]);
+void	execute_father(char *file, char *cmd, char *env[], int p[2]);
 
 #endif
